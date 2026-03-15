@@ -3,7 +3,7 @@
 This application will tell you about How much water you need to intake to stay hydrated in summers 2026.
 
 
-1) User will input -> age, sex, activity level
+1) User will input -> age, sex, activity level. and fetches user location, and then current temperature.
 2) feed this user inputs to model.
 3) update the prompt to take the input. (add summer 40°C temp)
 4) return the output, and display it to the frontend.
