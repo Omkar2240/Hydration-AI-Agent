@@ -1,21 +1,3 @@
-# from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
-
-
-
-# llm = HuggingFaceEndpoint(
-#     repo_id="mistralai/Mistral-7B-Instruct-v0.2",
-#     huggingfacehub_api_token="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",
-#     task="text-generation",
-#     max_new_tokens=100
-# )
-
-# chat_model = ChatHuggingFace(llm=llm)
-
-# response = chat_model.invoke("Explain recursion simply")
-
-# print(response.content)
-
-
 
 import os
 from openai import OpenAI
