@@ -3,7 +3,7 @@
 This application will tell you about How much water you need to intake to stay hydrated in summers 2026.
 
 
-1) User will input -> age, sex, activity level. and fetches user location, and then current temperature.
+1) User will input -> age, gender, activity level. and fetches user location, and then current temperature.
 2) feed this user inputs to model.
 3) update the prompt to take the input. (add summer 40°C temp)
 4) return the output, and display it to the frontend.
@@ -15,5 +15,17 @@ This application will tell you about How much water you need to intake to stay h
 
 # What we are using?
 
-1) Hugging face interface
+1) Open ai embedding
 2) model="mistralai/Mistral-7B-Instruct-v0.2:featherless-ai",
+3) FastAPI Backend
+4) Next.js Frontend
+5) open meteo API for fetching current temperature
+
+
+# steps to run
+
+1)  create virtual environment
+2) install requirements.txt
+3) run the server
+
+python -m uvicorn src.api:app --reload
