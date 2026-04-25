@@ -112,24 +112,6 @@ export default function Home() {
           </Card>
         </aside>
 
-        {/* <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:hidden">
-          {features.map((item) => (
-            <Card key={item.title}>
-              <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/5 text-lg">
-                  {item.icon}
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-slate-100">
-                    {item.title}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-300">{item.description}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div> */}
-
         <Navbar />
       </div>
     </main>
