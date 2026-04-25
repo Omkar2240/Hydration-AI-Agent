@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Card from "./ui/Card";
 import getTemperature from "@/lib/getTemp";
+import getBackendBaseUrl from "@/lib/backend-url";
 import Field from "./ui/Field";
 
 type Unit = "glasses" | "ml";
@@ -16,7 +16,6 @@ interface AnalyseFormProps {
 }
 
 function AnalyseForm({ isSubmitting, setIsSubmitting, setAnalysisResult }: AnalyseFormProps) {
-  const router = useRouter();
   const [unit, setUnit] = useState<Unit>("glasses");
   const [age, setAge] = useState("24");
   const [gender, setGender] = useState("Male");
@@ -28,6 +27,7 @@ function AnalyseForm({ isSubmitting, setIsSubmitting, setAnalysisResult }: Analy
   const [tempError, setTempError] = useState("");
   const [manualLocation, setManualLocation] = useState("");
   const [manualError, setManualError] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const [glassesIntake, setGlassesIntake] = useState("8");
   const [mlIntake, setMlIntake] = useState("2000");
 
@@ -37,37 +37,82 @@ function AnalyseForm({ isSubmitting, setIsSubmitting, setAnalysisResult }: Analy
       return;
     }
 
+    const parsedAge = Number.parseInt(age, 10);
+    const parsedIntake =
+      unit === "glasses"
+        ? Number.parseInt(glassesIntake, 10) * 250
+        : Number.parseInt(mlIntake, 10);
+
+    if (!Number.isFinite(parsedAge) || parsedAge <= 0) {
+      setSubmitError("Please enter a valid age.");
+      return;
+    }
+
+    if (!Number.isFinite(parsedIntake) || parsedIntake <= 0) {
+      setSubmitError("Please enter a valid daily intake.");
+      return;
+    }
+
     setIsSubmitting(true);
-    setAnalysisResult(null); // Clear previous result
-    const intakeMl = unit === "glasses" ? parseInt(glassesIntake) * 250 : parseInt(mlIntake);
+    setSubmitError("");
+    setAnalysisResult(null);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
-      const response = await fetch("http://localhost:8000/log-intake", {
+      const response = await fetch(`${getBackendBaseUrl()}/log-intake`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           user_id: "user_1",
-          intake_ml: intakeMl,
-          age: parseInt(age),
+          intake_ml: parsedIntake,
+          age: parsedAge,
           gender: gender,
           activity_level: activity,
           curr_temp: `${temp}°C`,
         }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : null;
+
+      if (!response.ok) {
+        const message =
+          typeof data?.detail === "string"
+            ? data.detail
+            : typeof data?.message === "string"
+              ? data.message
+              : `Request failed (${response.status})`;
+        throw new Error(message);
+      }
+
+      if (typeof data?.analysis !== "string") {
+        throw new Error("Invalid response from server.");
+      }
+
       setAnalysisResult(data.analysis);
       localStorage.setItem("hydrationAnalysis", data.analysis);
       localStorage.setItem("hydrationData", JSON.stringify({
-        intake_ml: intakeMl,
-        age: parseInt(age),
+        intake_ml: parsedIntake,
+        age: parsedAge,
         gender,
         activity,
         temp,
       }));
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error:", error);
+      const message =
+        error instanceof Error && error.name === "AbortError"
+          ? "Request timed out. Please try again."
+          : error instanceof Error
+            ? error.message
+            : "Failed to analyze hydration.";
+      setSubmitError(message);
     } finally {
+      clearTimeout(timeoutId);
       setIsSubmitting(false);
     }
   };
@@ -250,10 +295,14 @@ function AnalyseForm({ isSubmitting, setIsSubmitting, setAnalysisResult }: Analy
                       const value = await getTemperature(lat, lon);
                       setTemp(value);
                       setTempStatus("idle");
-                    } catch (err: any) {
+                    } catch (err: unknown) {
                       console.error(err);
                       setTempStatus("error");
-                      setManualError(err?.message || "Failed to fetch by manual location.");
+                      setManualError(
+                        err instanceof Error
+                          ? err.message
+                          : "Failed to fetch by manual location.",
+                      );
                     }
                   }}
                   className="rounded-xl px-4 py-2 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-300/40"
@@ -268,7 +317,13 @@ function AnalyseForm({ isSubmitting, setIsSubmitting, setAnalysisResult }: Analy
         </div>
       </Card>
 
-      <button 
+      {submitError && (
+        <p className="text-sm text-rose-200" role="alert">
+          {submitError}
+        </p>
+      )}
+
+      <button
         onClick={handleSubmit}
         disabled={isSubmitting}
         className="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-linear-to-r from-cyan-400 via-cyan-500 to-teal-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-[0_20px_60px_-25px_rgba(34,211,238,0.9)] transition hover:scale-[1.01] disabled:opacity-50"
