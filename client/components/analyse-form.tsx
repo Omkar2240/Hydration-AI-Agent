@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Card from "./ui/Card";
-import getTemperature from "@/lib/getTemp";
-import getBackendBaseUrl from "@/lib/backend-url";
+import getTemperature from "../lib/getTemp";
+import getBackendBaseUrl from "../lib/backend-url";
 import Field from "./ui/Field";
 
 type Unit = "glasses" | "ml";

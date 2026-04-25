@@ -1,5 +1,5 @@
 "use client";
-import getTemperature from "@/lib/getTemp";
+import getTemperature from "../lib/getTemp";
 import { useEffect, useState } from "react";
 
 export default function FindLocation() {
@@ -8,10 +8,10 @@ export default function FindLocation() {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-          const lat: number = pos.coords.latitude;
-          const lng: number = pos.coords.longitude;
-          const temp = await getTemperature(lat, lng);
-          setTemperature(temp);
+        const lat: number = pos.coords.latitude;
+        const lng: number = pos.coords.longitude;
+        const temp = await getTemperature(lat, lng);
+        setTemperature(temp);
       },
       (err) => console.log(err.message)
     );

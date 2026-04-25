@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Card from "@/components/ui/Card";
-import Navbar from "@/components/navbar";
+import Card from "../../components/ui/Card";
+import Navbar from "../../components/navbar";
 
 interface HydrationData {
   intake_ml: number;

@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 
-import Header from "@/components/header";
-import Navbar from "@/components/navbar";
-import Hero from "@/components/hero";
-import AnalyseForm from "@/components/analyse-form";
-import Card from "@/components/ui/Card";
+import Header from "./header";
+import Navbar from "./navbar";
+import Hero from "./hero";
+import AnalyseForm from "./analyse-form";
+import Card from "./ui/Card";
 
 const features = [
   {
