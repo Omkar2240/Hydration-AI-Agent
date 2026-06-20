@@ -1,12 +1,13 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+from groq import Groq
 
 load_dotenv()
 
-client = OpenAI(
-    base_url="https://router.huggingface.co/v1",
-    api_key=os.environ.get("HF_TOKEN"),
+
+client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY"),
 )
 
 # completion = client.chat.completions.create(
@@ -35,10 +36,10 @@ class WaterIntakeAgent:
         
         prompt = f"""In one short paragraph, analyze if {intake_ml} ml or glasses (if value is less than 200) daily water intake is sufficient for a healthy adult, 
         with the following characteristics: age {age}, gender {gender}, physical activity level {activity_level}, 
-        and climate {curr_temp}. Avoid disclaimers and repetition. Adjust context in 100 tokens or less."""
+        and climate {curr_temp}. Avoid disclaimers and repetition. Adjust context in 100 tokens or less. And Do not return think. Only return the answer"""
         
         response = client.chat.completions.create(
-            model="mistralai/Mistral-7B-Instruct-v0.2:featherless-ai",
+            model="llama-3.1-8b-instant",
             max_tokens=150,
             temperature=0.5,
             messages=[
